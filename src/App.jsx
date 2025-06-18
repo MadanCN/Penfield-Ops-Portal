@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Layout from './components/Layout.jsx';
+import Layout from './components/layout.jsx';
 import PatientModule from './components/PatientModule.jsx';
 import { Plus } from 'lucide-react';
 import './App.css';
