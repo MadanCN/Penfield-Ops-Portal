@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Layout from './components/layout.jsx';
 import PatientModule from './components/PatientModule.jsx';
-import TaskModule from './components/TaskModule.jsx';
-import AppointmentModule from './components/AppointmentModule.jsx';
+import TaskModule from './components/Task.jsx';
+import AppointmentModule from './components/Appointments.jsx';
 import { Plus } from 'lucide-react';
 import './App.css';
 
