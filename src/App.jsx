@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Layout from './components/layout.jsx';
 import PatientModule from './components/PatientModule.jsx';
+import TaskModule from './components/TaskModule.jsx';
+import AppointmentModule from './components/AppointmentModule.jsx';
 import { Plus } from 'lucide-react';
 import './App.css';
 
@@ -119,54 +121,10 @@ const App = () => {
         return <PatientModule />;
       
       case 'tasks':
-        return (
-          <div style={commonStyles.content}>
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px'}}>
-              <h1 style={commonStyles.pageTitle}>Task Management</h1>
-              <button style={commonStyles.button}>
-                <Plus size={16} />
-                Create Task
-              </button>
-            </div>
-            <div style={commonStyles.card}>
-              <p style={{color: '#9ca3af', margin: 0, fontSize: '16px'}}>
-                Task management module will be implemented here. This will include:
-              </p>
-              <ul style={{color: '#d1d5db', marginTop: '16px', paddingLeft: '20px'}}>
-                <li>Task assignment and tracking</li>
-                <li>Priority levels and due dates</li>
-                <li>Team collaboration features</li>
-                <li>Task status management</li>
-                <li>Automated reminders and notifications</li>
-              </ul>
-            </div>
-          </div>
-        );
+        return <TaskModule />;
 
       case 'appointments':
-        return (
-          <div style={commonStyles.content}>
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px'}}>
-              <h1 style={commonStyles.pageTitle}>Appointment Management</h1>
-              <button style={commonStyles.button}>
-                <Plus size={16} />
-                Schedule Appointment
-              </button>
-            </div>
-            <div style={commonStyles.card}>
-              <p style={{color: '#9ca3af', margin: 0, fontSize: '16px'}}>
-                Appointment management module will be implemented here. This will include:
-              </p>
-              <ul style={{color: '#d1d5db', marginTop: '16px', paddingLeft: '20px'}}>
-                <li>Calendar view with scheduling</li>
-                <li>Provider availability management</li>
-                <li>Patient appointment booking</li>
-                <li>Automated reminders</li>
-                <li>Waitlist management</li>
-              </ul>
-            </div>
-          </div>
-        );
+        return <AppointmentModule />;
 
       case 'forms':
         return (
@@ -265,8 +223,8 @@ const App = () => {
                 </h3>
                 <ul style={{color: '#d1d5db', margin: 0, paddingLeft: '20px'}}>
                   <li>Staff accounts and profiles</li>
-                  <li>Access control settings</li>
                   <li>Department assignments</li>
+                  <li>Access control settings</li>
                   <li>Training and certifications</li>
                 </ul>
               </div>
