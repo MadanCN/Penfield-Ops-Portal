@@ -15,100 +15,190 @@ import {
   SortAsc,
   SortDesc,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  Users,
+  Activity,
+  MessageSquare,
+  RefreshCw,
+  Forward,
+  Ban
 } from 'lucide-react';
 
-// Mock Data
+// Enhanced Mock Data based on specifications
 const mockTasks = [
   {
     id: 1,
-    taskSubject: 'Patient Intake Review',
-    taskDescription: 'Review new patient intake forms and medical history for John Smith',
+    taskSubject: 'Schedule Initial Evaluation',
+    taskDescription: 'Schedule the initial evaluation appointment for John Smith as part of Spravato treatment plan initiation',
     createdDate: '2024-06-20',
     dueDate: '2024-06-22',
     taskType: 'Treatment Plan',
-    taskStatus: 'In-progress',
+    taskStatus: 'In Progress',
     patientId: 1,
     patientName: 'John Smith',
-    assignedTo: 'current-user',
-    createdBy: 'Dr. Sarah Wilson',
-    escalator: 'Dr. Michael Chen',
-    priority: 'High'
+    assignedToUserId: 'current-user',
+    assignedToName: 'Current User',
+    createdByUserId: 'dr-wilson',
+    createdByName: 'Dr. Sarah Wilson',
+    escalationTargetUserId: 'dr-chen',
+    escalationTargetName: 'Dr. Michael Chen',
+    priority: 'High',
+    escalationTimeMinutes: 2880, // 48 hours
+    parentTaskId: null,
+    treatmentPlanId: 1,
+    clinicId: 1
   },
   {
     id: 2,
-    taskSubject: 'Insurance Verification',
-    taskDescription: 'Verify insurance details for Sarah Johnson and update records',
+    taskSubject: 'Insurance Authorization Request',
+    taskDescription: 'Submit insurance authorization request for Sarah Johnson Spravato treatment',
     createdDate: '2024-06-19',
     dueDate: '2024-06-21',
-    taskType: 'Administrative',
-    taskStatus: 'In-progress',
+    taskType: 'Standard',
+    taskStatus: 'Escalated',
     patientId: 2,
     patientName: 'Sarah Johnson',
-    assignedTo: 'current-user',
-    createdBy: 'Lisa Rodriguez',
-    escalator: 'Dr. Sarah Wilson',
-    priority: 'Medium'
+    assignedToUserId: 'current-user',
+    assignedToName: 'Current User',
+    createdByUserId: 'lisa-rodriguez',
+    createdByName: 'Lisa Rodriguez',
+    escalationTargetUserId: 'dr-wilson',
+    escalationTargetName: 'Dr. Sarah Wilson',
+    priority: 'High',
+    escalationTimeMinutes: 1440, // 24 hours
+    parentTaskId: null,
+    treatmentPlanId: null,
+    clinicId: 1
   },
   {
     id: 3,
-    taskSubject: 'Treatment Plan Approval',
-    taskDescription: 'Review and approve Spravato treatment plan for Michael Brown',
+    taskSubject: 'REMS Portal Update',
+    taskDescription: 'Update REMS portal with patient information and treatment plan details for Michael Brown',
     createdDate: '2024-06-18',
     dueDate: '2024-06-20',
     taskType: 'Treatment Plan',
     taskStatus: 'Completed',
     patientId: 3,
     patientName: 'Michael Brown',
-    assignedTo: 'other-user',
-    createdBy: 'Dr. Michael Chen',
-    escalator: 'Dr. Sarah Wilson',
-    priority: 'High'
+    assignedToUserId: 'other-user',
+    assignedToName: 'Emily Davis',
+    createdByUserId: 'dr-chen',
+    createdByName: 'Dr. Michael Chen',
+    escalationTargetUserId: 'dr-wilson',
+    escalationTargetName: 'Dr. Sarah Wilson',
+    priority: 'Medium',
+    escalationTimeMinutes: 2880, // 48 hours
+    parentTaskId: null,
+    treatmentPlanId: 2,
+    clinicId: 1
   },
   {
     id: 4,
-    taskSubject: 'Appointment Scheduling',
-    taskDescription: 'Schedule follow-up appointment for Emma Davis',
+    taskSubject: 'Rejection Request - Appointment Scheduling',
+    taskDescription: 'The following task has been rejected, please review it. Original task: Schedule follow-up appointment for Emma Davis',
     createdDate: '2024-06-17',
     dueDate: '2024-06-19',
-    taskType: 'Administrative',
-    taskStatus: 'Rejected',
+    taskType: 'Rejection Request',
+    taskStatus: 'In Progress',
     patientId: 4,
     patientName: 'Emma Davis',
-    assignedTo: 'other-user',
-    createdBy: 'Lisa Rodriguez',
-    escalator: 'Dr. Sarah Wilson',
-    priority: 'Low'
+    assignedToUserId: 'dr-wilson',
+    assignedToName: 'Dr. Sarah Wilson',
+    createdByUserId: 'system',
+    createdByName: 'System',
+    escalationTargetUserId: 'clinic-admin',
+    escalationTargetName: 'Clinic Administrator',
+    priority: 'Medium',
+    escalationTimeMinutes: 1440, // 24 hours
+    parentTaskId: 5,
+    treatmentPlanId: null,
+    clinicId: 1,
+    rejectionReason: 'Patient requested different time slot that conflicts with provider availability',
+    rejectedBy: 'Mike Johnson'
+  },
+  {
+    id: 6,
+    taskSubject: 'Patient Intake Documentation Review',
+    taskDescription: 'Review and verify completeness of intake documentation for new patient Jennifer Wilson',
+    createdDate: '2024-06-16',
+    dueDate: '2024-06-18',
+    taskType: 'Standard',
+    taskStatus: 'Rejected',
+    patientId: 5,
+    patientName: 'Jennifer Wilson',
+    assignedToUserId: 'other-user',
+    assignedToName: 'Emily Davis',
+    createdByUserId: 'lisa-rodriguez',
+    createdByName: 'Lisa Rodriguez',
+    escalationTargetUserId: 'dr-wilson',
+    escalationTargetName: 'Dr. Sarah Wilson',
+    priority: 'Low',
+    escalationTimeMinutes: 4320, // 72 hours
+    parentTaskId: null,
+    treatmentPlanId: null,
+    clinicId: 1
   }
 ];
 
 const TASK_STATUSES = {
-  IN_PROGRESS: 'In-progress',
+  IN_PROGRESS: 'In Progress',
   COMPLETED: 'Completed',
   REJECTED: 'Rejected',
-  CANCELLED: 'Cancelled'
+  CANCELLED: 'Cancelled',
+  ESCALATED: 'Escalated',
+  REASSIGNED: 'Reassigned'
 };
 
 const TASK_TYPES = {
   TREATMENT_PLAN: 'Treatment Plan',
-  ADMINISTRATIVE: 'Administrative',
-  CLINICAL: 'Clinical',
-  INSURANCE: 'Insurance'
+  STANDARD: 'Standard',
+  REJECTION_REQUEST: 'Rejection Request'
 };
+
+const PRIORITY_LEVELS = {
+  LOW: 'Low',
+  MEDIUM: 'Medium',
+  HIGH: 'High',
+  CRITICAL: 'Critical'
+};
+
+// Mock users for assignment
+const mockUsers = [
+  { id: 'dr-wilson', name: 'Dr. Sarah Wilson', role: 'Provider POC' },
+  { id: 'dr-chen', name: 'Dr. Michael Chen', role: 'Provider POC' },
+  { id: 'lisa-rodriguez', name: 'Lisa Rodriguez', role: 'Intake Team' },
+  { id: 'emily-davis', name: 'Emily Davis', role: 'Scheduling Team' },
+  { id: 'mike-johnson', name: 'Mike Johnson', role: 'Scheduling Team' }
+];
 
 const TaskModule = () => {
   const [activeTab, setActiveTab] = useState('my-tasks');
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [filters, setFilters] = useState({
+    taskStatus: '',
+    taskType: '',
+    priority: '',
+    createdDateFrom: '',
+    createdDateTo: '',
+    dueDateFrom: '',
+    dueDateTo: ''
+  });
   const [sortBy, setSortBy] = useState('createdDate');
   const [sortOrder, setSortOrder] = useState('desc');
   const [selectedTask, setSelectedTask] = useState(null);
   const [showSidebar, setShowSidebar] = useState(false);
   const [showMarkDoneModal, setShowMarkDoneModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showEscalationModal, setShowEscalationModal] = useState(false);
   const [taskToAction, setTaskToAction] = useState(null);
   const [completionComments, setCompletionComments] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
+  const [escalationAction, setEscalationAction] = useState('forward'); // forward, reassign, cancel
+  const [escalationTarget, setEscalationTarget] = useState('');
+  const [escalationInstructions, setEscalationInstructions] = useState('');
+  const [reassignmentTarget, setReassignmentTarget] = useState('');
+  const [reassignmentNotes, setReassignmentNotes] = useState('');
+  const [cancellationReason, setCancellationReason] = useState('');
 
   // Common styles object
   const styles = {
@@ -200,6 +290,7 @@ const TaskModule = () => {
     badgeRed: { backgroundColor: '#dc2626', color: 'white' },
     badgeYellow: { backgroundColor: '#d97706', color: 'white' },
     badgePurple: { backgroundColor: '#7c3aed', color: 'white' },
+    badgeOrange: { backgroundColor: '#ea580c', color: 'white' },
     badgeGray: { backgroundColor: '#6b7280', color: 'white' },
     searchWrapper: {
       position: 'relative',
@@ -237,6 +328,7 @@ const TaskModule = () => {
     actionEdit: { color: '#60a5fa' },
     actionSuccess: { color: '#34d399' },
     actionDelete: { color: '#f87171' },
+    actionWarning: { color: '#fbbf24' },
     tabContainer: {
       borderBottom: '1px solid #374151',
       marginBottom: '24px'
@@ -278,8 +370,10 @@ const TaskModule = () => {
       backgroundColor: '#1f2937',
       borderRadius: '8px',
       padding: '24px',
-      maxWidth: '500px',
-      width: '90%'
+      maxWidth: '600px',
+      width: '90%',
+      maxHeight: '80vh',
+      overflow: 'auto'
     },
     sidebar: {
       position: 'fixed',
@@ -315,6 +409,10 @@ const TaskModule = () => {
         return styles.badgeRed;
       case TASK_STATUSES.CANCELLED:
         return styles.badgeGray;
+      case TASK_STATUSES.ESCALATED:
+        return styles.badgeOrange;
+      case TASK_STATUSES.REASSIGNED:
+        return styles.badgePurple;
       default:
         return styles.badgeBlue;
     }
@@ -322,12 +420,27 @@ const TaskModule = () => {
 
   const getPriorityBadgeStyle = (priority) => {
     switch (priority) {
-      case 'High':
+      case PRIORITY_LEVELS.CRITICAL:
         return styles.badgeRed;
-      case 'Medium':
+      case PRIORITY_LEVELS.HIGH:
+        return styles.badgeOrange;
+      case PRIORITY_LEVELS.MEDIUM:
         return styles.badgeYellow;
-      case 'Low':
+      case PRIORITY_LEVELS.LOW:
         return styles.badgeGreen;
+      default:
+        return styles.badgeGray;
+    }
+  };
+
+  const getTaskTypeBadgeStyle = (type) => {
+    switch (type) {
+      case TASK_TYPES.TREATMENT_PLAN:
+        return styles.badgePurple;
+      case TASK_TYPES.STANDARD:
+        return styles.badgeBlue;
+      case TASK_TYPES.REJECTION_REQUEST:
+        return styles.badgeYellow;
       default:
         return styles.badgeGray;
     }
@@ -335,6 +448,22 @@ const TaskModule = () => {
 
   const formatDate = (dateString) => {
     return dateString ? new Date(dateString).toLocaleDateString() : 'Not provided';
+  };
+
+  const formatDateTime = (dateString) => {
+    return dateString ? new Date(dateString).toLocaleString() : 'Not provided';
+  };
+
+  const calculateDaysOverdue = (dueDate) => {
+    const today = new Date();
+    const due = new Date(dueDate);
+    const diffTime = today - due;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+  };
+
+  const isTaskOverdue = (dueDate) => {
+    return new Date(dueDate) < new Date();
   };
 
   const handleSort = (column) => {
@@ -348,9 +477,10 @@ const TaskModule = () => {
 
   const getSortedAndFilteredTasks = () => {
     let filtered = mockTasks.filter(task => {
-      // Tab filtering
-      if (activeTab === 'my-tasks' && task.assignedTo !== 'current-user') {
-        return false;
+      // Tab filtering - My Tasks shows only current user's tasks with active statuses
+      if (activeTab === 'my-tasks') {
+        if (task.assignedToUserId !== 'current-user') return false;
+        if (!['In Progress', 'Escalated', 'Rejected'].includes(task.taskStatus)) return false;
       }
       
       // Search filtering
@@ -359,10 +489,29 @@ const TaskModule = () => {
         task.taskDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
         task.patientName.toLowerCase().includes(searchTerm.toLowerCase());
       
-      // Status filtering
-      const matchesStatus = !statusFilter || task.taskStatus === statusFilter;
+      // Filter conditions
+      const matchesStatus = !filters.taskStatus || task.taskStatus === filters.taskStatus;
+      const matchesType = !filters.taskType || task.taskType === filters.taskType;
+      const matchesPriority = !filters.priority || task.priority === filters.priority;
       
-      return matchesSearch && matchesStatus;
+      // Date range filtering
+      let matchesCreatedDateRange = true;
+      if (filters.createdDateFrom) {
+        matchesCreatedDateRange = matchesCreatedDateRange && new Date(task.createdDate) >= new Date(filters.createdDateFrom);
+      }
+      if (filters.createdDateTo) {
+        matchesCreatedDateRange = matchesCreatedDateRange && new Date(task.createdDate) <= new Date(filters.createdDateTo);
+      }
+      
+      let matchesDueDateRange = true;
+      if (filters.dueDateFrom) {
+        matchesDueDateRange = matchesDueDateRange && new Date(task.dueDate) >= new Date(filters.dueDateFrom);
+      }
+      if (filters.dueDateTo) {
+        matchesDueDateRange = matchesDueDateRange && new Date(task.dueDate) <= new Date(filters.dueDateTo);
+      }
+      
+      return matchesSearch && matchesStatus && matchesType && matchesPriority && matchesCreatedDateRange && matchesDueDateRange;
     });
 
     // Sorting
@@ -380,6 +529,11 @@ const TaskModule = () => {
         case 'dueDate':
           aValue = new Date(a.dueDate);
           bValue = new Date(b.dueDate);
+          break;
+        case 'priority':
+          const priorityOrder = { 'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1 };
+          aValue = priorityOrder[a.priority] || 0;
+          bValue = priorityOrder[b.priority] || 0;
           break;
         default:
           aValue = new Date(a.createdDate);
@@ -409,6 +563,11 @@ const TaskModule = () => {
     setShowRejectModal(true);
   };
 
+  const handleEscalation = (task) => {
+    setTaskToAction(task);
+    setShowEscalationModal(true);
+  };
+
   const confirmMarkDone = () => {
     console.log('Marking task done:', taskToAction, 'Comments:', completionComments);
     setShowMarkDoneModal(false);
@@ -427,25 +586,46 @@ const TaskModule = () => {
     setRejectionReason('');
   };
 
+  const confirmEscalation = () => {
+    const escalationData = {
+      task: taskToAction,
+      action: escalationAction,
+      target: escalationTarget,
+      instructions: escalationInstructions,
+      reassignmentTarget,
+      reassignmentNotes,
+      cancellationReason
+    };
+    console.log('Processing escalation:', escalationData);
+    setShowEscalationModal(false);
+    setTaskToAction(null);
+    setEscalationAction('forward');
+    setEscalationTarget('');
+    setEscalationInstructions('');
+    setReassignmentTarget('');
+    setReassignmentNotes('');
+    setCancellationReason('');
+  };
+
   const handleTaskClick = (task) => {
     console.log('Redirecting to patient record:', task.patientId);
     // In a real app, this would navigate to the patient record
   };
 
-  // Task List Component
+  // Enhanced Task List Component
   const TaskList = () => {
     const filteredTasks = getSortedAndFilteredTasks();
 
     return (
       <div>
-        {/* Search and Filters */}
+        {/* Enhanced Search and Filters */}
         <div style={{...styles.card, marginBottom: '24px'}}>
-          <div style={{display: 'flex', gap: '16px', alignItems: 'end', flexWrap: 'wrap'}}>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', alignItems: 'end'}}>
             <div style={styles.searchWrapper}>
               <Search style={styles.searchIcon} size={16} />
               <input 
                 type="text" 
-                placeholder="Search tasks..." 
+                placeholder="Search tasks, patients..." 
                 style={styles.searchInput}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -453,14 +633,14 @@ const TaskModule = () => {
             </div>
             
             {activeTab === 'all-tasks' && (
-              <div style={{minWidth: '150px'}}>
+              <div>
                 <label style={{color: '#d1d5db', fontSize: '12px', marginBottom: '4px', display: 'block'}}>
                   Task Status
                 </label>
                 <select 
                   style={styles.select}
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
+                  value={filters.taskStatus}
+                  onChange={(e) => setFilters({...filters, taskStatus: e.target.value})}
                 >
                   <option value="">All Statuses</option>
                   {Object.values(TASK_STATUSES).map(status => (
@@ -469,10 +649,83 @@ const TaskModule = () => {
                 </select>
               </div>
             )}
+
+            <div>
+              <label style={{color: '#d1d5db', fontSize: '12px', marginBottom: '4px', display: 'block'}}>
+                Task Type
+              </label>
+              <select 
+                style={styles.select}
+                value={filters.taskType}
+                onChange={(e) => setFilters({...filters, taskType: e.target.value})}
+              >
+                <option value="">All Types</option>
+                {Object.values(TASK_TYPES).map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{color: '#d1d5db', fontSize: '12px', marginBottom: '4px', display: 'block'}}>
+                Priority
+              </label>
+              <select 
+                style={styles.select}
+                value={filters.priority}
+                onChange={(e) => setFilters({...filters, priority: e.target.value})}
+              >
+                <option value="">All Priorities</option>
+                {Object.values(PRIORITY_LEVELS).map(priority => (
+                  <option key={priority} value={priority}>{priority}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{color: '#d1d5db', fontSize: '12px', marginBottom: '4px', display: 'block'}}>
+                Created From
+              </label>
+              <input 
+                type="date" 
+                style={styles.select}
+                value={filters.createdDateFrom}
+                onChange={(e) => setFilters({...filters, createdDateFrom: e.target.value})}
+              />
+            </div>
+
+            <div>
+              <label style={{color: '#d1d5db', fontSize: '12px', marginBottom: '4px', display: 'block'}}>
+                Due Date From
+              </label>
+              <input 
+                type="date" 
+                style={styles.select}
+                value={filters.dueDateFrom}
+                onChange={(e) => setFilters({...filters, dueDateFrom: e.target.value})}
+              />
+            </div>
+
+            <div>
+              <button 
+                style={{...styles.button, backgroundColor: '#6b7280'}}
+                onClick={() => setFilters({
+                  taskStatus: '',
+                  taskType: '',
+                  priority: '',
+                  createdDateFrom: '',
+                  createdDateTo: '',
+                  dueDateFrom: '',
+                  dueDateTo: ''
+                })}
+              >
+                Clear Filters
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Task Table */}
+        {/* Enhanced Task Table */}
         <div style={styles.table}>
           <div style={{overflowX: 'auto'}}>
             <table style={styles.tableElement}>
@@ -513,86 +766,164 @@ const TaskModule = () => {
                     </div>
                   </th>
                   <th style={styles.th}>TASK TYPE</th>
+                  <th 
+                    style={styles.th}
+                    onClick={() => handleSort('priority')}
+                  >
+                    <div style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
+                      PRIORITY
+                      {sortBy === 'priority' && (
+                        sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />
+                      )}
+                    </div>
+                  </th>
                   {activeTab === 'all-tasks' && <th style={styles.th}>STATUS</th>}
                   <th style={styles.th}>ACTIONS</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredTasks.map(task => (
-                  <tr key={task.id}>
-                    <td 
-                      style={{
-                        ...styles.td, 
-                        ...styles.tdWhite, 
-                        cursor: 'pointer',
-                        textDecoration: 'underline'
-                      }} 
-                      onClick={() => handleTaskClick(task)}
-                    >
-                      <div>
-                        <div>{task.taskSubject}</div>
-                        <div style={{fontSize: '12px', color: '#9ca3af', marginTop: '2px'}}>
-                          Patient: {task.patientName}
+                {filteredTasks.map(task => {
+                  const isOverdue = isTaskOverdue(task.dueDate);
+                  const daysOverdue = calculateDaysOverdue(task.dueDate);
+                  
+                  return (
+                    <tr key={task.id}>
+                      <td 
+                        style={{
+                          ...styles.td, 
+                          ...styles.tdWhite, 
+                          cursor: 'pointer',
+                          textDecoration: 'underline'
+                        }} 
+                        onClick={() => handleTaskClick(task)}
+                      >
+                        <div>
+                          <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                            {task.taskSubject}
+                            {isOverdue && (
+                              <AlertTriangle size={14} style={{color: '#ef4444'}} title={`Overdue by ${daysOverdue} days`} />
+                            )}
+                          </div>
+                          <div style={{fontSize: '12px', color: '#9ca3af', marginTop: '2px'}}>
+                            Patient: {task.patientName}
+                          </div>
+                          {task.parentTaskId && (
+                            <div style={{fontSize: '11px', color: '#7c3aed', marginTop: '2px'}}>
+                              Related to Task #{task.parentTaskId}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </td>
-                    <td style={styles.td}>
-                      <div style={{maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis'}}>
-                        {task.taskDescription}
-                      </div>
-                    </td>
-                    <td style={styles.td}>
-                      <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                        <Calendar size={14} style={{color: '#9ca3af'}} />
-                        {formatDate(task.createdDate)}
-                      </div>
-                    </td>
-                    <td style={styles.td}>
-                      <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                        <Clock size={14} style={{color: '#9ca3af'}} />
-                        {formatDate(task.dueDate)}
-                      </div>
-                    </td>
-                    <td style={styles.td}>
-                      <span style={{...styles.badge, ...styles.badgePurple}}>
-                        {task.taskType}
-                      </span>
-                    </td>
-                    {activeTab === 'all-tasks' && (
+                      </td>
                       <td style={styles.td}>
-                        <span style={{...styles.badge, ...getStatusBadgeStyle(task.taskStatus)}}>
-                          {task.taskStatus}
+                        <div style={{maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis'}}>
+                          {task.taskDescription}
+                        </div>
+                        {task.rejectionReason && (
+                          <div style={{fontSize: '11px', color: '#f59e0b', marginTop: '4px', fontStyle: 'italic'}}>
+                            Rejection Reason: {task.rejectionReason}
+                          </div>
+                        )}
+                      </td>
+                      <td style={styles.td}>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                          <Calendar size={14} style={{color: '#9ca3af'}} />
+                          <div>
+                            <div>{formatDate(task.createdDate)}</div>
+                            <div style={{fontSize: '11px', color: '#9ca3af'}}>
+                              by {task.createdByName}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                          <Clock size={14} style={{color: isOverdue ? '#ef4444' : '#9ca3af'}} />
+                          <div>
+                            <div style={{color: isOverdue ? '#ef4444' : 'inherit'}}>
+                              {formatDate(task.dueDate)}
+                            </div>
+                            {isOverdue && (
+                              <div style={{fontSize: '11px', color: '#ef4444'}}>
+                                {daysOverdue} days overdue
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td style={styles.td}>
+                        <span style={{...styles.badge, ...getTaskTypeBadgeStyle(task.taskType)}}>
+                          {task.taskType}
                         </span>
                       </td>
-                    )}
-                    <td style={styles.td}>
-                      <div style={styles.actionButtons}>
-                        <button 
-                          style={{...styles.actionButton, ...styles.actionEdit}}
-                          onClick={() => handleViewTask(task)}
-                        >
-                          View
-                        </button>
-                        {activeTab === 'my-tasks' && task.taskStatus === TASK_STATUSES.IN_PROGRESS && (
-                          <>
-                            <button 
-                              style={{...styles.actionButton, ...styles.actionSuccess}}
-                              onClick={() => handleMarkDone(task)}
-                            >
-                              Mark Done
-                            </button>
-                            <button 
-                              style={{...styles.actionButton, ...styles.actionDelete}}
-                              onClick={() => handleReject(task)}
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      <td style={styles.td}>
+                        <span style={{...styles.badge, ...getPriorityBadgeStyle(task.priority)}}>
+                          {task.priority}
+                        </span>
+                      </td>
+                      {activeTab === 'all-tasks' && (
+                        <td style={styles.td}>
+                          <span style={{...styles.badge, ...getStatusBadgeStyle(task.taskStatus)}}>
+                            {task.taskStatus}
+                          </span>
+                        </td>
+                      )}
+                      <td style={styles.td}>
+                        <div style={styles.actionButtons}>
+                          <button 
+                            style={{...styles.actionButton, ...styles.actionEdit}}
+                            onClick={() => handleViewTask(task)}
+                          >
+                            View
+                          </button>
+                          {activeTab === 'my-tasks' && (
+                            <>
+                              {/* Status-specific actions based on specifications */}
+                              {task.taskStatus === TASK_STATUSES.IN_PROGRESS && (
+                                <>
+                                  <button 
+                                    style={{...styles.actionButton, ...styles.actionSuccess}}
+                                    onClick={() => handleMarkDone(task)}
+                                  >
+                                    Mark Done
+                                  </button>
+                                  <button 
+                                    style={{...styles.actionButton, ...styles.actionDelete}}
+                                    onClick={() => handleReject(task)}
+                                  >
+                                    Reject
+                                  </button>
+                                </>
+                              )}
+                              {task.taskStatus === TASK_STATUSES.ESCALATED && (
+                                <>
+                                  <button 
+                                    style={{...styles.actionButton, ...styles.actionSuccess}}
+                                    onClick={() => handleMarkDone(task)}
+                                  >
+                                    Mark Done
+                                  </button>
+                                  <button 
+                                    style={{...styles.actionButton, ...styles.actionDelete}}
+                                    onClick={() => handleReject(task)}
+                                  >
+                                    Reject
+                                  </button>
+                                  <button 
+                                    style={{...styles.actionButton, ...styles.actionWarning}}
+                                    onClick={() => handleEscalation(task)}
+                                  >
+                                    Escalate
+                                  </button>
+                                </>
+                              )}
+                              {/* Rejected tasks only have View access as per specs */}
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -611,7 +942,7 @@ const TaskModule = () => {
     );
   };
 
-  // Task Detail Sidebar
+  // Enhanced Task Detail Sidebar with complete task information
   const TaskDetailSidebar = () => (
     <>
       <div style={styles.overlay} onClick={() => setShowSidebar(false)} />
@@ -635,12 +966,15 @@ const TaskModule = () => {
                 <h4 style={{color: 'white', margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600'}}>
                   {selectedTask.taskSubject}
                 </h4>
-                <div style={{display: 'flex', gap: '8px', marginBottom: '12px'}}>
+                <div style={{display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap'}}>
                   <span style={{...styles.badge, ...getStatusBadgeStyle(selectedTask.taskStatus)}}>
                     {selectedTask.taskStatus}
                   </span>
                   <span style={{...styles.badge, ...getPriorityBadgeStyle(selectedTask.priority)}}>
                     {selectedTask.priority} Priority
+                  </span>
+                  <span style={{...styles.badge, ...getTaskTypeBadgeStyle(selectedTask.taskType)}}>
+                    {selectedTask.taskType}
                   </span>
                 </div>
               </div>
@@ -667,10 +1001,10 @@ const TaskModule = () => {
 
                 <div>
                   <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
-                    Task Type
+                    Assigned To
                   </label>
                   <p style={{color: 'white', margin: 0}}>
-                    {selectedTask.taskType}
+                    {selectedTask.assignedToName}
                   </p>
                 </div>
 
@@ -691,6 +1025,11 @@ const TaskModule = () => {
                   <p style={{color: 'white', margin: 0, display: 'flex', alignItems: 'center', gap: '8px'}}>
                     <Clock size={16} />
                     {formatDate(selectedTask.dueDate)}
+                    {isTaskOverdue(selectedTask.dueDate) && (
+                      <span style={{color: '#ef4444', fontSize: '12px'}}>
+                        ({calculateDaysOverdue(selectedTask.dueDate)} days overdue)
+                      </span>
+                    )}
                   </p>
                 </div>
 
@@ -699,22 +1038,62 @@ const TaskModule = () => {
                     Created By
                   </label>
                   <p style={{color: 'white', margin: 0}}>
-                    {selectedTask.createdBy}
+                    {selectedTask.createdByName}
                   </p>
                 </div>
 
                 <div>
                   <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
-                    Escalator
+                    Escalation Target
                   </label>
                   <p style={{color: 'white', margin: 0}}>
-                    {selectedTask.escalator}
+                    {selectedTask.escalationTargetName}
                   </p>
                 </div>
+
+                {selectedTask.escalationTimeMinutes && (
+                  <div>
+                    <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
+                      Escalation Time
+                    </label>
+                    <p style={{color: 'white', margin: 0}}>
+                      {Math.floor(selectedTask.escalationTimeMinutes / 60)} hours ({selectedTask.escalationTimeMinutes} minutes)
+                    </p>
+                  </div>
+                )}
+
+                {selectedTask.parentTaskId && (
+                  <div>
+                    <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
+                      Parent Task
+                    </label>
+                    <p style={{color: '#7c3aed', margin: 0}}>
+                      Task #{selectedTask.parentTaskId}
+                    </p>
+                  </div>
+                )}
+
+                {selectedTask.rejectionReason && (
+                  <div>
+                    <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
+                      Rejection Reason
+                    </label>
+                    <p style={{color: '#f59e0b', margin: 0, fontStyle: 'italic'}}>
+                      {selectedTask.rejectionReason}
+                    </p>
+                    {selectedTask.rejectedBy && (
+                      <p style={{color: '#9ca3af', margin: '4px 0 0 0', fontSize: '12px'}}>
+                        Rejected by: {selectedTask.rejectedBy}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {selectedTask.taskStatus === TASK_STATUSES.IN_PROGRESS && selectedTask.assignedTo === 'current-user' && (
-                <div style={{display: 'flex', gap: '12px', marginTop: '20px'}}>
+              {/* Action buttons based on task status and user permissions */}
+              {(selectedTask.taskStatus === TASK_STATUSES.IN_PROGRESS || selectedTask.taskStatus === TASK_STATUSES.ESCALATED) && 
+               selectedTask.assignedToUserId === 'current-user' && (
+                <div style={{display: 'flex', gap: '12px', marginTop: '20px', flexWrap: 'wrap'}}>
                   <button 
                     style={{...styles.button, backgroundColor: '#10b981'}}
                     onClick={() => handleMarkDone(selectedTask)}
@@ -729,6 +1108,42 @@ const TaskModule = () => {
                     <AlertTriangle size={16} />
                     Reject
                   </button>
+                  {selectedTask.taskStatus === TASK_STATUSES.ESCALATED && (
+                    <button 
+                      style={{...styles.button, backgroundColor: '#f59e0b'}}
+                      onClick={() => handleEscalation(selectedTask)}
+                    >
+                      <RefreshCw size={16} />
+                      Handle Escalation
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Rejection Request specific actions */}
+              {selectedTask.taskType === TASK_TYPES.REJECTION_REQUEST && 
+               selectedTask.assignedToUserId === 'current-user' && (
+                <div style={{display: 'flex', gap: '12px', marginTop: '20px', flexWrap: 'wrap'}}>
+                  <button 
+                    style={{...styles.button, backgroundColor: '#10b981'}}
+                    onClick={() => {
+                      console.log('Accepting rejection for task:', selectedTask.parentTaskId);
+                      // This would change the original task status to Cancelled
+                    }}
+                  >
+                    <CheckCircle size={16} />
+                    Accept Rejection
+                  </button>
+                  <button 
+                    style={{...styles.button, backgroundColor: '#2563eb'}}
+                    onClick={() => {
+                      console.log('Reassigning task:', selectedTask.parentTaskId);
+                      // This would open reassignment modal
+                    }}
+                  >
+                    <RefreshCw size={16} />
+                    Reassign
+                  </button>
                 </div>
               )}
             </div>
@@ -738,7 +1153,7 @@ const TaskModule = () => {
     </>
   );
 
-  // Mark Done Modal
+  // Enhanced Mark Done Modal
   const MarkDoneModal = () => (
     showMarkDoneModal && (
       <div style={styles.modal}>
@@ -754,6 +1169,17 @@ const TaskModule = () => {
               <X size={24} />
             </button>
           </div>
+
+          {taskToAction && (
+            <div style={{marginBottom: '20px', padding: '16px', backgroundColor: '#374151', borderRadius: '8px'}}>
+              <h4 style={{color: 'white', margin: '0 0 8px 0', fontSize: '16px'}}>
+                {taskToAction.taskSubject}
+              </h4>
+              <p style={{color: '#d1d5db', margin: 0, fontSize: '14px'}}>
+                Patient: {taskToAction.patientName}
+              </p>
+            </div>
+          )}
 
           <div style={{marginBottom: '20px'}}>
             <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
@@ -786,7 +1212,7 @@ const TaskModule = () => {
     )
   );
 
-  // Reject Modal
+  // Enhanced Reject Modal with escalation warning
   const RejectModal = () => (
     showRejectModal && (
       <div style={styles.modal}>
@@ -797,6 +1223,17 @@ const TaskModule = () => {
               Reject Task
             </h3>
           </div>
+
+          {taskToAction && (
+            <div style={{marginBottom: '20px', padding: '16px', backgroundColor: '#374151', borderRadius: '8px'}}>
+              <h4 style={{color: 'white', margin: '0 0 8px 0', fontSize: '16px'}}>
+                {taskToAction.taskSubject}
+              </h4>
+              <p style={{color: '#d1d5db', margin: 0, fontSize: '14px'}}>
+                Patient: {taskToAction.patientName}
+              </p>
+            </div>
+          )}
 
           <div style={{marginBottom: '20px'}}>
             <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
@@ -822,7 +1259,8 @@ const TaskModule = () => {
                 ⚠️ Warning
               </p>
               <p style={{color: '#d1d5db', margin: '8px 0 0 0', fontSize: '14px'}}>
-                The task will be forwarded to <strong>{taskToAction.escalator}</strong> for review after rejection.
+                The task will be forwarded to <strong>{taskToAction.escalationTargetName}</strong> for review after rejection.
+                A new "Rejection Request" task will be created for review.
               </p>
             </div>
           )}
@@ -846,11 +1284,146 @@ const TaskModule = () => {
     )
   );
 
+  // New Escalation Handling Modal
+  const EscalationModal = () => (
+    showEscalationModal && (
+      <div style={styles.modal}>
+        <div style={{...styles.modalContent, maxWidth: '700px'}}>
+          <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px'}}>
+            <RefreshCw size={24} style={{color: '#f59e0b'}} />
+            <h3 style={{color: 'white', margin: 0, fontSize: '18px', fontWeight: '600'}}>
+              Handle Escalated Task
+            </h3>
+          </div>
+
+          {taskToAction && (
+            <div style={{marginBottom: '20px', padding: '16px', backgroundColor: '#374151', borderRadius: '8px'}}>
+              <h4 style={{color: 'white', margin: '0 0 8px 0', fontSize: '16px'}}>
+                {taskToAction.taskSubject}
+              </h4>
+              <p style={{color: '#d1d5db', margin: 0, fontSize: '14px'}}>
+                Patient: {taskToAction.patientName} | Priority: {taskToAction.priority}
+              </p>
+            </div>
+          )}
+
+          <div style={{marginBottom: '20px'}}>
+            <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
+              Escalation Action *
+            </label>
+            <select 
+              style={styles.select}
+              value={escalationAction}
+              onChange={(e) => setEscalationAction(e.target.value)}
+            >
+              <option value="forward">Forward to Different Staff</option>
+              <option value="reassign">Reassign to Original Assignee</option>
+              <option value="cancel">Cancel Task</option>
+            </select>
+          </div>
+
+          {escalationAction === 'forward' && (
+            <>
+              <div style={{marginBottom: '16px'}}>
+                <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
+                  Forward To *
+                </label>
+                <select 
+                  style={styles.select}
+                  value={escalationTarget}
+                  onChange={(e) => setEscalationTarget(e.target.value)}
+                >
+                  <option value="">Select Staff Member</option>
+                  {mockUsers.map(user => (
+                    <option key={user.id} value={user.id}>{user.name} ({user.role})</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{marginBottom: '16px'}}>
+                <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
+                  Forwarding Instructions
+                </label>
+                <textarea 
+                  style={{...styles.input, minHeight: '80px', resize: 'vertical'}}
+                  value={escalationInstructions}
+                  onChange={(e) => setEscalationInstructions(e.target.value)}
+                  placeholder="Enter instructions for the assigned staff..."
+                />
+              </div>
+            </>
+          )}
+
+          {escalationAction === 'reassign' && (
+            <>
+              <div style={{marginBottom: '16px'}}>
+                <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
+                  Reassign To (Optional)
+                </label>
+                <select 
+                  style={styles.select}
+                  value={reassignmentTarget}
+                  onChange={(e) => setReassignmentTarget(e.target.value)}
+                >
+                  <option value="">Return to Original Assignee</option>
+                  {mockUsers.map(user => (
+                    <option key={user.id} value={user.id}>{user.name} ({user.role})</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{marginBottom: '16px'}}>
+                <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
+                  Additional Instructions/Guidance
+                </label>
+                <textarea 
+                  style={{...styles.input, minHeight: '80px', resize: 'vertical'}}
+                  value={reassignmentNotes}
+                  onChange={(e) => setReassignmentNotes(e.target.value)}
+                  placeholder="Enter additional guidance or instructions..."
+                />
+              </div>
+            </>
+          )}
+
+          {escalationAction === 'cancel' && (
+            <div style={{marginBottom: '16px'}}>
+              <label style={{color: '#d1d5db', fontSize: '14px', fontWeight: '500', marginBottom: '6px', display: 'block'}}>
+                Cancellation Reason *
+              </label>
+              <textarea 
+                style={{...styles.input, minHeight: '80px', resize: 'vertical'}}
+                value={cancellationReason}
+                onChange={(e) => setCancellationReason(e.target.value)}
+                placeholder="Enter reason for task cancellation..."
+              />
+            </div>
+          )}
+
+          <div style={{display: 'flex', gap: '12px'}}>
+            <button 
+              style={{...styles.button, backgroundColor: '#f59e0b'}}
+              onClick={confirmEscalation}
+            >
+              {escalationAction === 'forward' && 'Forward Task'}
+              {escalationAction === 'reassign' && 'Reassign Task'}
+              {escalationAction === 'cancel' && 'Cancel Task'}
+            </button>
+            <button 
+              style={{...styles.button, backgroundColor: '#6b7280'}}
+              onClick={() => setShowEscalationModal(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  );
+
   return (
     <div style={styles.content}>
       <h1 style={styles.pageTitle}>Task Management</h1>
 
-      {/* Tab Navigation */}
+      {/* Enhanced Tab Navigation with counts */}
       <div style={styles.tabContainer}>
         <ul style={styles.tabList}>
           <li>
@@ -861,7 +1434,19 @@ const TaskModule = () => {
               }}
               onClick={() => setActiveTab('my-tasks')}
             >
-              My Tasks
+              <div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                <User size={16} />
+                My Tasks
+                <span style={{
+                  ...styles.badge, 
+                  backgroundColor: '#374151', 
+                  color: '#d1d5db',
+                  marginLeft: '4px'
+                }}>
+                  {mockTasks.filter(t => t.assignedToUserId === 'current-user' && 
+                    ['In Progress', 'Escalated', 'Rejected'].includes(t.taskStatus)).length}
+                </span>
+              </div>
             </button>
           </li>
           <li>
@@ -872,7 +1457,18 @@ const TaskModule = () => {
               }}
               onClick={() => setActiveTab('all-tasks')}
             >
-              All Tasks
+              <div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                <Users size={16} />
+                All Tasks
+                <span style={{
+                  ...styles.badge, 
+                  backgroundColor: '#374151', 
+                  color: '#d1d5db',
+                  marginLeft: '4px'
+                }}>
+                  {mockTasks.length}
+                </span>
+              </div>
             </button>
           </li>
         </ul>
@@ -883,6 +1479,7 @@ const TaskModule = () => {
       {showSidebar && <TaskDetailSidebar />}
       <MarkDoneModal />
       <RejectModal />
+      <EscalationModal />
     </div>
   );
 };

@@ -17,7 +17,7 @@ const App = () => {
     const commonStyles = {
       content: {
         flex: 1,
-        overflow: 'auto',
+        overflow: 'auto',  
         backgroundColor: '#111827',
         padding: '24px'
       },
